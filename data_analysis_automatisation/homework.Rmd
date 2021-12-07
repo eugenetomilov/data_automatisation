@@ -1,0 +1,398 @@
+---
+title: "homework"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+
+```
+
+**Context**
+According to the World Health Organization (WHO) stroke is the 2nd leading cause of death globally, responsible for approximately 11% of total deaths.
+This dataset is used to predict whether a patient is likely to get stroke based on the input parameters like gender, age, various diseases, and smoking status. Each row in the data provides relevant information about the patient.
+
+**Attribute Information**
+1) id: unique identifier
+2) gender: "Male", "Female" or "Other"
+3) age: age of the patient
+4) hypertension: 0 if the patient doesn't have hypertension, 1 if the patient has hypertension
+5) heart_disease: 0 if the patient doesn't have any heart diseases, 1 if the patient has a heart disease
+6) ever_married: "No" or "Yes"
+7) work_type: "children", "Govt_jov", "Never_worked", "Private" or "Self-employed"
+8) Residence_type: "Rural" or "Urban"
+9) avg_glucose_level: average glucose level in blood
+10) bmi: body mass index
+11) smoking_status: "formerly smoked", "never smoked", "smokes" or "Unknown"*
+12) stroke: 1 if the patient had a stroke or 0 if not
+*Note: "Unknown" in smoking_status means that the information is unavailable for this patient
+
+# Загрузка данных
+
+```{r}
+
+
+
+```
+
+# Общий анализ датасета
+
+**Вопрос 1. Сколько числовых переменных в датасете? (число)**
+
+Ответ: 
+
+**Вопрос 2. Сколько категориальных переменных в датасете? (число)**
+
+Ответ: 
+
+**Вопрос 3. Почему стоит переводить строковые переменные в категориальные? (свободный ответ)**
+
+Ответ: 
+
+```{r}
+
+
+
+```
+
+# Приведение переменных к верным типам
+
+**Задание 1. Измените в переменной *bmi* значения "N/A" на пустые значения.**
+
+**Задание 1.1. Измените её тип на правильный.**
+
+**Задание 2. Приведите все строковые переменные к категориальным.**
+
+**Задание 3. Приведите переменныю id, stroke, hypertension, heart_disease к правильному типу.**
+
+**Задание 4. Сохраните изменённые данные в переменную data.**
+
+
+*Примечание со звёздочкой*: задания 1 и 1.1 возможно выполнить с помощью единственной функцией.
+
+```{r}
+
+
+
+```
+
+# Работа с числовыми переменными
+
+**ВНИМАНИЕ**: Начиная с этого задания работаем с данными в переменной `data`.
+
+**Задание 5. Выведите в чанке ниже все количественные переменные, напишите их количество**
+
+Количество: 
+
+```{r}
+
+
+
+```
+
+**Задание 6. Рассчитайте для каждой из числовых переменных следующие статистики и сохраните получившуюся статистику в переменную numeric_table**
+
+1) Минимум;
+
+2) Максимум;
+
+3) Среднее значение;
+
+4) Медиану;
+
+5) Стандартное отклонение;
+
+6) 95% Ди для среднего;
+
+7) Первый квартиль;
+
+8) Третий квартиль;
+
+9) Интерквартильный размах;
+
+10) Количество значений;
+
+11) Количество пропущенных значений.
+
+```{r}
+
+
+
+```
+
+**Задание 7. Выведите id пациентов, у которых bmi строго выше среднего.**
+
+```{r}
+
+
+
+```
+
+**Задание 7. Выведите id пациентов, у которых bmi строго выше среднего, а возраст между первым и третьим квартилями включительно.**
+
+```{r}
+
+
+
+```
+
+**Задание 8. Создайте новую переменную bmi_normalized. Для её создания вычтите из каждого значения переменной bmi среднее значение данной переменной, а потом разделите на стандартное отклонение данной переменной.**
+
+Примечание: это можно сделать в одну строку.
+
+**Вопрос 4. Что происходит в пропущенными значениями при выполнении задания 8? (свободный ответ)**
+
+Ответ: 
+
+```{r}
+
+
+
+```
+
+**Задание 9. Рассчитайте описательные статистики для всех количественных переменных, сгруппировав данные по наличию инсульта. Сохраните в переменную numeric_table_grouped.**
+
+1) Минимум;
+
+2) Максимум;
+
+3) Среднее значение;
+
+4) Медиану;
+
+5) Стандартное отклонение;
+
+6) 95% Ди для среднего;
+
+7) Первый квартиль;
+
+8) Третий квартиль;
+
+9) Интерквартильный размах;
+
+10) Количество значений;
+
+11) Количество пропущенных значений.
+
+```{r}
+
+
+
+```
+
+**Задание 11. Выведите id пяти испытуемых с наивысшим bmi в порядке убывания.**
+
+```{r}
+
+
+
+```
+
+
+# Работа с категориальными переменными
+
+**Задание 11. Выведите только те категориальные переменные, которые имеют два уникальных значения.**
+
+```{r}
+
+
+
+```
+
+**Задание 12. Выведите только те категориальные переменные, которые имеют более двух уникальных значений.**
+
+```{r}
+
+
+
+```
+
+**Задание 13. Создайте описательную таблицу для категориальных переменных, в которую включите: абсолютное количество, долю. Сохраните в переменную categorical_table.**
+
+Примечание: нужно ли делать описательную статистику для id?
+
+```{r}
+
+
+  
+```
+
+**Задание 14. Создайте сгруппированную по наличию инсульта описательную таблицу для категориальных переменных, в которую включите: абсолютное количество, долю по выборке, долю по группе. Сохраните в переменную categorical_table_grouped.**
+
+Примечание: нужно ли делать описательную статистику для id?
+
+```{r}
+
+
+  
+```
+
+# Выведение таблиц в Word
+
+**Задание 15. Выведите таблицу numeric_table.**
+
+```{r}
+
+
+
+```
+
+**Задание 16. Выведите таблицу numeric_table_grouped.**
+
+**Вопрос 5. Сколько всего испытуемых имеют инсульт, а сколько не имеют?**
+
+Ответ: 
+
+```{r}
+
+
+
+```
+
+**Задание 17. Выведите таблицу categorical_table.**
+
+```{r}
+
+
+
+```
+
+**Задание 18. Выведите таблицу categorical_table_grouped.**
+
+**Вопрос 6. У скольки женщин был инсульт?**
+
+Ответ:
+
+**Вопрос 7. У скольки людей с гипертензией не было инсульта?**
+
+Ответ: 
+
+```{r}
+
+
+
+```
+
+**Задание 19. Напечатайте весь документ в Word.**
+
+
+# Некоторый бонус
+
+В чанке ниже находится подготовленная функция, с помощью которой можно создать категориальную описательную таблицу, разбитую по визитам и группам, дополненную доверительными интервалами для доли и статистическими тестами между группами.
+
+Вы можете разобрать эту функцию и использовать в дальнейшей практике. =)
+
+```{r}
+
+make_test <- function(data) {
+  
+  data %>%
+    select(value, n) %>%
+    pivot_wider(names_from = value, values_from = n) %>%
+    unnest() %>%
+    as.matrix() -> matrix_data
+
+  if (any(matrix_data < 5)) {
+    
+    matrix_data %>%
+    fisher.test() %>%
+    .$p.value %>%
+    pretty_p() %>%
+      return()
+    
+  } else {
+    
+    matrix_data %>%
+    chisq.test(simulate.p.value = TRUE) %>%
+    .$p.value %>%
+    pretty_p() %>%
+      return()
+    
+  }
+   
+}
+  
+make_cat_table <- function(data, vars, group_vars) {
+  
+  data <- data %>% select(group_vars, contains(vars))
+  
+  make_binom_multinom_ci <- function(temp_data, vars) {
+    
+      if(length(temp_data[[vars]]) <= 2) {
+      
+      BinomCI(temp_data[[vars]], sum(temp_data[[vars]]), conf.level = 0.95, method = "clopper-pearson", sides = "two.sided") %>%
+      round(2) %>%
+      as_tibble() %>%
+      select(-est) %>%
+      unite("95% ДИ", lwr.ci, upr.ci, sep = ", ")
+      
+    } else {
+      
+      MultinomCI(temp_data[[vars]], conf.level = 0.95, method = "sisonglaz", sides = "two.sided") %>%
+      round(2) %>%
+      as_tibble() %>%
+      select(-est) %>%
+      unite("95% ДИ", lwr.ci, upr.ci, sep = ", ")
+      
+    }
+    
+  }
+  
+  names(data) %>% .[. != group_vars] %>%
+    map(function(x) data %>% count(.data[[group_vars]], .data[[x]], .drop = FALSE) %>%
+          mutate(all_proc = (n / sum(n)) %>% round(4) %>% `*`(100) %>% paste0(., "%")) %>%
+          group_by(.data[[group_vars]]) %>%
+          mutate(group_proc = (n / sum(n)) %>% round(4) %>% `*`(100) %>% paste0(., "%")) %>%
+          ungroup() %>%
+          pivot_longer(cols = x) %>%
+          separate(name, into = c("Переменная", "Визит"), sep = "__") %>%
+          bind_cols(., make_binom_multinom_ci(., vars = "n"))) %>%
+    map(function(x) x %>% mutate(`Критерий Фишера / Критерий хи-квадрат, p-value` = make_test(x))) %>%
+  
+    bind_rows() %>%
+    filter(Визит != "Группа") %>%
+    select(`Переменная`, `Визит`, `Группа`, `Значение` = value, `Количество` = n, `% по группе` = group_proc, `% по группам для   визита` = all_proc, `95% ДИ`, `Критерий Фишера / Критерий хи-квадрат, p-value`) %>%
+    make_visit_as_factor(visit_var = "Визит") %>%
+    arrange(Переменная, Визит, Группа) %>%
+    mutate(Визит = str_replace_all(Визит, "_", " ")) 
+
+}
+
+```
+
+```{r}
+
+example_data <- mtcars %>% 
+  select(vs, am, gear, carb) %>%
+  mutate(across(everything(), as.factor))
+
+names(example_data) %>%
+  set_names() %>%
+  map(function(x) example_data %>% 
+                  count(.data[[x]], .drop = FALSE) %>%
+                  mutate(all_proc = (n / sum(n)) %>% round(4) %>% `*`(100) %>% paste0(., "%")) %>%
+                  pivot_longer(cols = x) %>%
+                  select(!name)) %>%
+  enframe() %>%
+  unnest() %>%
+  select(name, value, n, all_proc)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

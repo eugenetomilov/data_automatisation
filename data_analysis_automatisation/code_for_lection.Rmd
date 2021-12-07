@@ -1,0 +1,1540 @@
+---
+title: "notes_for_course"
+author: "You"
+date: "18.09.2021"
+output:
+  word_document:
+    reference_docx: "example.docx"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,     # отображение кода в итоговом документе
+                      message = FALSE,  # отображение сообщений в итоговом документе
+                      error = FALSE,    # отображение ошибок в итоговом документе
+                      warning = FALSE,  # отображение предупреждений в итоговом документе
+                      cache = FALSE,    # надо ли сохранять код в чанках до их изменений
+                      fig.height = 15, # высота рисунка в дюймах
+                      fig.width = 15)  # широта рисунка в дюймах
+
+library(tidyverse)
+library(readxl)
+library(flextable)
+
+pretty_p <- function(x) ifelse(x < 0.001, "<0.001", as.character(round(x, 3)))
+
+```
+
+# read data
+
+```{r}
+
+original_data <- iris
+
+original_data
+
+```
+
+```{r}
+
+# txt, csv, xlsx, xls
+
+iris %>% write_tsv("data/interim/iris_txt.txt")
+iris %>% write_csv("data/interim/iris_csv.csv")
+iris %>% write_csv2("data/interim/iris_csv2.csv")
+
+```
+
+```{r}
+
+iris_txt <- read_tsv("data/interim/iris_txt.txt")
+iris_csv <- read_csv("data/interim/iris_csv.csv")
+iris_csv2 <- read_csv2("data/interim/iris_csv2.csv")
+iris_xlsx <- read_excel("data/interim/iris_xlsx.xlsx")
+
+```
+
+```{r}
+
+read_tsv(
+  "data/interim/iris_txt.txt", # путь к файлу
+  na = c("", "NA"),            # обозначения пропущенных значений
+  skip = 0,                    # количество пропущенных строк в начале
+  n_max = Inf,                 # сколько максимум строк прочитать
+  skip_empty_rows = TRUE       # пропускать ли полностью пустые строки
+)
+
+```
+
+```{r}
+
+iris %>%
+  select(Sepal.Length, Species) %>%           # выбор
+  mutate(Sepal.Length = Sepal.Length + 1) %>% # изменение
+  filter(Sepal.Length < 6) %>%                # фильтрация
+  slice(1:100) %>%                            # срез строк
+  rename(kind_of_flower = Species) %>%        # переименование
+  arrange(Sepal.Length) %>%                   # сортировка
+  distinct(Sepal.Length, .keep_all = TRUE)    # уникальные значения 
+
+```
+
+```{r}
+
+iris
+
+```
+
+```{r}
+
+iris %>%
+  glimpse()
+
+```
+
+```{r}
+
+iris %>%
+  dplyr::select(Sepal.Length, Species) # выбор
+
+```
+
+```{r}
+
+iris %>%
+  dplyr::select(!c(Sepal.Length, Species)) # выбор
+
+```
+
+```{r}
+
+iris %>%
+  dplyr::select(contains("Sepal")) # выбор
+
+```
+
+```{r}
+
+iris %>%
+  dplyr::select(!contains("Sepal")) # выбор
+
+```
+
+```{r}
+
+iris %>%
+  dplyr::select(starts_with("Sepal")) # выбор
+
+```
+
+
+```{r}
+
+iris %>%
+  dplyr::select(where(is.numeric)) # выбор
+
+```
+
+```{r}
+
+iris %>%
+  dplyr::select(!where(is.numeric)) # выбор
+
+```
+
+```{r}
+
+iris %>%
+  dplyr::select(where(is.numeric) | contains("Species")) # выбор
+
+```
+
+```{r}
+
+iris %>%
+  dplyr::select(function(x) mean(x) > 3) # выбор
+
+```
+
+```{r}
+
+iris %>%
+  dplyr::select(Species, everything()) # выбор
+
+```
+
+```{r}
+
+iris %>%
+  filter(Species == "setosa")
+
+```
+
+```{r}
+
+iris %>%
+  filter(Species != "setosa")
+
+```
+
+```{r}
+
+iris %>%
+  filter(Species %in% c("setosa", "virginica"))
+
+```
+
+```{r}
+
+iris %>%
+  filter(!(Species %in% c("setosa", "virginica")))
+
+```
+
+```{r}
+
+iris %>%
+  filter(Sepal.Length < 5)
+
+```
+
+```{r}
+
+iris %>%
+  filter(Sepal.Length > 5)
+
+```
+
+```{r}
+
+iris %>%
+  filter(Sepal.Length >= 5)
+
+```
+
+```{r}
+
+iris %>%
+  filter(Sepal.Length <= 5)
+
+```
+
+```{r}
+
+iris %>%
+  filter(Sepal.Length == 5)
+
+```
+
+```{r}
+
+iris %>%
+  filter(Sepal.Length != 5)
+
+```
+
+```{r}
+
+iris %>%
+  filter(between(Sepal.Length, 2, 5))
+
+```
+
+```{r}
+
+iris %>%
+  filter(!between(Sepal.Length, 2, 5))
+
+```
+
+```{r}
+
+iris %>%
+  filter(Species == "setosa", Sepal.Length < 5)
+
+```
+
+Приоритет логических операторов от высшего к низшему
+
+x < y, x > y, x <= y, x => y, x == y, x != y # операторы сравнения
+!x                                           # логическое НЕ
+x & y                                        # логическое И
+x | y                                        # логическое ИЛИ
+
+```{r}
+
+x <- 1
+y <- 2
+z <- 2
+
+x < y
+x > y
+
+!(x < y)
+!(x > y)
+
+(x < y) & (x > y)
+
+(x < y) | (x > y)
+
+
+x < y & z != y | x < z
+
+x < y
+z != y
+x < z
+
+TRUE & FALSE | TRUE
+
+FALSE | TRUE
+
+TRUE
+
+x < y & (z != y | x < z)
+
+TRUE & (FALSE | TRUE)
+
+TRUE & TRUE
+
+TRUE
+
+```
+
+```{r}
+
+iris %>%
+  filter(Species == "setosa" | Sepal.Width == 3 & Sepal.Length < 5.1)
+
+```
+
+```{r}
+
+iris %>%
+  filter((Species == "virginica" | Sepal.Width == 3) & Sepal.Length < 5.1)
+
+```
+
+```{r}
+
+iris %>%
+  slice(1:50)
+  
+```
+
+```{r}
+
+iris %>%
+  slice(1:50*-1)
+  
+```
+
+```{r}
+
+iris %>%
+  slice(seq(1, 50, 2))
+  
+```
+
+```{r}
+
+iris %>%
+  slice(seq(1, 50, 2)*-1)
+  
+```
+
+# mutate
+
+```{r}
+
+iris %>%
+  mutate(Sepal.Length = Sepal.Length + 1)
+
+```
+
+```{r}
+
+iris %>%
+  mutate(Sepal.Length_1 = Sepal.Length + 1)
+
+```
+
+```{r}
+
+iris %>%
+  mutate(across(c(Sepal.Length, Sepal.Width), function(x) x + 1))
+
+```
+
+```{r}
+
+iris %>%
+  mutate(across(contains("Length"), function(x) x + 1))
+
+```
+
+```{r}
+
+iris %>%
+  mutate(across(!contains("Length"), function(x) x + 1))
+
+```
+
+```{r}
+
+iris %>%
+  mutate(across(where(is.numeric), function(x) x + 1))
+
+```
+
+```{r}
+
+iris %>%
+  mutate(across(where(is.numeric) & contains("Length"), function(x) x + 1))
+
+```
+
+```{r}
+
+iris %>%
+  mutate(across(where(is.numeric) & contains("Length"), function(x) x %>% as.factor()))
+
+```
+
+```{r}
+
+levels(iris$Species)
+
+iris %>%
+  mutate(Species_numeric = Species %>% as.numeric()) %>%
+  count(Species, Species_numeric) %>%
+  select(!n)
+
+```
+
+```{r}
+
+iris %>%
+  mutate(Species = Species %>% as.character() %>% factor(levels = c("versicolor", "setosa", "virginica"), labels = c("VERSICOLOR", "SETOSA", "VIRGINICA"), ordered = TRUE)) %>%
+  
+  pull(Species)
+
+```
+
+```{r}
+
+test_data <- tibble(test_var = c(1, 2, 3, 1, 2, 3))
+
+test_data %>%
+  mutate(test_var = test_var %>% factor(levels = c("1", "2", "3"), labels = c("Группа 1", "Группа 2", "Группа 3"), ordered = TRUE)) %>%
+  pull(test_var)
+
+```
+
+
+
+
+```{r}
+
+iris %>%
+  arrange(Sepal.Length)
+
+```
+
+```{r}
+
+iris %>%
+  arrange(desc(Sepal.Length))
+
+```
+
+```{r}
+
+iris %>%
+  arrange(Sepal.Length, desc(Sepal.Width))
+
+```
+
+```{r}
+
+iris %>%
+  mutate(Species = Species %>% as.character() %>% factor(levels = c("versicolor", "setosa", "virginica"), labels = c("VERSICOLOR", "SETOSA", "VIRGINICA"), ordered = TRUE)) %>%
+  arrange(desc(Species))
+
+```
+
+```{r}
+
+test_data <- tibble(test_var = c("abc", "acb", "adb"))
+
+#a b c d
+
+test_data %>%
+  arrange(test_var)
+
+```
+
+```{r}
+
+iris %>%
+  rename(kind_of_flower = Species,
+         sepal_length = Sepal.Length)
+
+```
+
+```{r}
+
+iris %>%
+  rename_all(function(x) x %>% str_replace("Length", "Длина"))
+
+```
+
+```{r}
+
+iris %>%
+  rename_all(function(x) x %>% stringi::stri_replace_all_regex(c("Length", "Width"), c("Длина", "Ширина"), vectorize_all = FALSE))
+
+```
+
+```{r}
+
+iris %>%
+  distinct()
+
+```
+
+```{r}
+
+iris %>%
+  distinct(Species, Petal.Width, .keep_all = TRUE)
+
+```
+
+```{r}
+
+iris %>%
+  mutate(Species = Species %>% as.numeric()) %>%
+  .$Species
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+
+iris %>%
+  filter(Species == "setosa") # фильтрация
+
+```
+
+```{r}
+
+iris %>%
+  filter(Sepal.Length < 4.5) # фильтрация
+
+```
+
+```{r}
+
+iris %>%
+  filter(Sepal.Length < 4.5 & Species == "setosa") # фильтрация
+
+```
+
+```{r}
+
+iris %>%
+  filter(Sepal.Length < 4.5 & Species == "setosa" | Species == "virginica") # фильтрация
+
+```
+
+Приоритет логических операторов от высшего к низшему
+
+x < y, x > y, x <= y, x => y, x == y, x != y # операторы сравнения
+!x                                           # логическое НЕ
+x & y                                        # логическое И
+x | y                                        # логическое ИЛИ
+
+```{r}
+
+x <- 1
+y <- 2
+
+x < y & y > x
+
+```
+
+```{r}
+
+x <- 1
+y <- 2
+
+x > y & y < x | x != y
+
+```
+
+```{r}
+
+x <- 1
+y <- 2
+
+x > y & (y < x | x != y)
+
+```
+
+```{r}
+
+iris %>%
+  filter(Sepal.Length < 4.5 & Species == "setosa" | Species == "virginica") # фильтрация
+
+```
+
+
+```{r}
+
+iris %>%
+  slice(1:100) # срез строк
+
+```
+
+```{r}
+
+iris %>%
+  slice(1:100*-1) # срез строк
+
+```
+
+```{r}
+
+iris %>%
+  mutate(Sepal.Length_1 = Sepal.Length + 1) # изменение
+
+```
+
+```{r}
+
+iris %>%
+  mutate(across(where(is.numeric), function(x) x - 4)) # изменение
+
+```
+
+```{r}
+
+iris %>%
+  mutate(across(c(Sepal.Length, Petal.Width), function(x) x - mean(x))) # изменение
+
+```
+
+```{r}
+
+iris %>%
+  mutate(across(where(is.factor), function(x) stringr::str_c("iris is ", x))) # изменение
+
+```
+
+```{r}
+
+iris %>%
+  arrange(Sepal.Length) # сортировка по возрастанию
+
+```
+
+```{r}
+
+iris %>%
+  arrange(desc(Sepal.Length)) # сортировка по убыванию
+
+```
+
+```{r}
+
+iris %>%
+  rename(kind_of_flower = Species) # переименование
+
+```
+
+```{r}
+
+iris %>%
+  rename_all(function(x) stringr::str_c("variable is ", x)) # переименование
+
+```
+
+```{r}
+
+iris %>%
+  distinct(Species, .keep_all = TRUE) # уникальные значения 
+
+```
+
+```{r}
+
+iris %>%
+  distinct() # уникальные строки 
+
+```
+
+# как сделать нумерацию уникальных пациентов и/или как оставить только дубликаты
+
+```{r}
+
+iris %>%
+  group_by_all() %>%
+  mutate(unique_id = cur_group_id()) %>%
+  ungroup() %>%
+  arrange(unique_id) %>%
+  View()
+
+
+
+#%>%
+  #count(unique_id, sort = TRUE)
+
+
+#%>%
+  #filter(unique_id != 77)
+
+```
+
+
+```{r}
+
+short_function <- function(a, b) a + b
+
+long_function <- function(a, b) {
+  
+  short_function <- function(a, b) a + b
+  
+  if (a < 5) {
+    
+    return("Нужно большее значение")
+    
+  }
+  
+  as.character(short_function(a, b) * a)
+  
+}
+
+short_function(2, 1)
+
+long_function(6, 1)
+
+```
+
+```{r}
+
+filter_less_n <- function(data, vars, number) {
+  
+  data %>%
+    filter(.data[[vars]] < number)
+  
+}
+
+iris %>%
+  filter_less_n("Sepal.Length", 5)
+
+```
+
+```{r}
+
+iris %>%
+  pivot_longer(!Species) %>%
+  pivot_wider() %>%
+  unnest()
+
+```
+
+```{r}
+
+statistics_list <- list(
+  
+  `__Максимум` = function(x) max(x, na.rm = TRUE),
+  `__Минимум` = function(x) min(x, na.rm = TRUE),
+  `__Среднее значение` = function(x) mean(x, na.rm = TRUE),
+  `__Медиана` = function(x) median(x, na.rm = TRUE)
+  
+)
+
+iris %>%
+  summarise(across(c(Sepal.Length, Sepal.Width, Petal.Length, Petal.Width), statistics_list)) %>%
+  pivot_longer(everything()) %>%
+  separate(name, into = c("Переменная", "Параметр"), sep = "___")
+
+```
+
+```{r}
+
+iris %>%
+  group_by(Species)
+
+```
+
+```{r}
+
+statistics_list <- list(
+  
+  `__Максимум` = function(x) max(x, na.rm = TRUE),
+  `__Минимум` = function(x) min(x, na.rm = TRUE),
+  `__Среднее значение` = function(x) mean(x, na.rm = TRUE),
+  `__Медиана` = function(x) median(x, na.rm = TRUE)
+  
+)
+
+iris %>%
+  group_by(Species) %>%
+  summarise(across(c(Sepal.Length, Sepal.Width, Petal.Length, Petal.Width), statistics_list)) %>%
+  pivot_longer(!Species) %>%
+  separate(name, into = c("Переменная", "Параметр"), sep = "___")
+
+```
+
+```{r}
+
+iris %>%
+  unite("species_sepal_length", Species, Sepal.Length, sep = ", sepal length is ", remove = TRUE)
+
+```
+
+```{r}
+
+iris %>%
+  unite("species_sepal_length", Species, Sepal.Length, sep = ", sepal length is ", remove = TRUE)
+
+```
+
+
+```{r}
+
+statistics_list <- list(
+  
+  `__Максимум` = function(x) max(x, na.rm = TRUE),
+  `__Минимум` = function(x) min(x, na.rm = TRUE),
+  `__Среднее значение` = function(x) mean(x, na.rm = TRUE),
+  `__Медиана` = function(x) median(x, na.rm = TRUE)
+  
+)
+
+iris %>%
+  group_by(Species) %>%
+  summarise(across(c(Sepal.Length, Sepal.Width, Petal.Length, Petal.Width), statistics_list)) %>%
+  pivot_longer(!Species) %>%
+  separate(name, into = c("Переменная", "Параметр"), sep = "___") -> iris_stats_by_group
+
+iris_stats_by_group %>%
+  
+  rename(`Группа` = Species,
+         `Значение` = value) %>%
+  
+  mutate(`Значение` = `Значение` %>% round(2),
+         
+         `Переменная` = case_when(`Переменная` == "Sepal.Length" ~ "Длина чашелистика",
+                                  `Переменная` == "Sepal.Width" ~ "Ширина чашелистика",
+                                  `Переменная` == "Petal.Length" ~ "Длина лепестка",
+                                  `Переменная` == "Petal.Width" ~ "Ширина лепестка"),
+         
+         `Группа` = `Группа` %>% str_to_sentence()
+         ) -> iris_stats_by_group
+
+```
+
+```{r}
+
+iris$Sepal.Length %>% length()
+iris$Sepal.Length %>% is.na() %>% sum()
+iris$Sepal.Length %>% t.test() %>% .$conf %>% as.numeric() %>% round(2) %>% str_c(collapse = ", ") %>% str_c("95% ДИ: ", .)
+iris$Sepal.Length %>% quantile(0.25, na.rm = TRUE, names = FALSE)
+iris$Sepal.Length %>% quantile(0.75, na.rm = TRUE, names = FALSE)
+
+iris$Sepal.Length %>% quantile(0.75, na.rm = TRUE, names = FALSE) - iris$Sepal.Length %>% quantile(0.25, na.rm = TRUE, names = FALSE)
+
+```
+
+```{r}
+
+iris %>%
+  mutate(petal_length_less_4 = ifelse(Petal.Length < 4, "Да", "Нет") %>% factor(levels = c("Да", "Нет"))) %>%
+  count(Species, petal_length_less_4, .drop = FALSE) %>%
+  
+  group_by(Species) %>%
+  mutate(n_perc = (n / sum(n)) %>% round(4) %>% `*`(100) %>% str_c(., "%")) %>%
+  ungroup() %>%
+  
+  mutate(n_abs = (n / sum(n)) %>% round(4) %>% `*`(100) %>% str_c(., "%"))
+
+```
+
+## Неотформатированная таблица
+
+```{r}
+
+iris_stats_by_group %>%
+  flextable()
+
+```
+
+## Таблица без заголовка
+
+```{r}
+
+statistics_list <- list(
+  
+  `__Максимум` = function(x) max(x, na.rm = TRUE),
+  `__Минимум` = function(x) min(x, na.rm = TRUE),
+  `__Среднее значение` = function(x) mean(x, na.rm = TRUE),
+  `__Медиана` = function(x) median(x, na.rm = TRUE)
+  
+)
+
+iris %>%
+  group_by(Species) %>%
+  summarise(across(c(Sepal.Length, Sepal.Width, Petal.Length, Petal.Width), statistics_list)) %>%
+  pivot_longer(!Species) %>%
+  separate(name, into = c("Переменная", "Параметр"), sep = "___") -> iris_stats_by_group
+
+iris_stats_by_group %>%
+  
+  rename(`Группа` = Species,
+         `Значение` = value) %>%
+  
+  mutate(`Значение` = `Значение` %>% round(2),
+         
+         `Переменная` = case_when(`Переменная` == "Sepal.Length" ~ "Длина чашелистика",
+                                  `Переменная` == "Sepal.Width" ~ "Ширина чашелистика",
+                                  `Переменная` == "Petal.Length" ~ "Длина лепестка",
+                                  `Переменная` == "Petal.Width" ~ "Ширина лепестка"),
+         
+         `Группа` = `Группа` %>% str_to_sentence()
+         ) -> iris_stats_by_group
+
+iris_stats_by_group %>%
+  flextable() %>%
+  theme_box() %>%
+  align(align = "center", part = "all") %>%
+  merge_v(c("Группа", "Переменная"))
+
+
+
+
+```
+
+## Таблица с склееными ячейками
+
+```{r}
+
+iris_stats_by_group %>%
+  flextable() %>%
+  theme_box() %>%
+  align(align = "center", part = "all") %>%
+  merge_at(i = 1:2, j = 1:2)
+  
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+
+long_function <- function(a, b) {
+  
+  a + b
+  
+}
+
+short_function <- function(a, b) a + b
+
+long_function(1, 2)
+short_function(1, 2)
+
+```
+
+```{r}
+
+filter_less_n <- function(data, vars, n) {
+  
+  data %>%
+    filter(.data[[vars]] < n)
+  
+}
+
+filter_less_n(iris, "Sepal.Length", 5)
+
+```
+
+
+```{r}
+
+iris %>%
+  summary()
+
+```
+
+```{r}
+
+stats <- list(
+  
+  `__Максимум` = function(x) min(x, na.rm = TRUE),
+  `__Минимум` = function(x) max(x, na.rm = TRUE),
+  `__Среднее значение` = function(x) mean(x, na.rm = TRUE),
+  `__Медиана` = function(x) median(x, na.rm = TRUE)
+  
+)
+
+iris %>%
+  summarise(across(c(Sepal.Length, Sepal.Width), stats)) %>%
+  pivot_longer(everything()) %>%
+  separate(name, into = c("Переменная", "Параметр"), sep = "___")
+
+```
+
+```{r}
+
+iris %>%
+  group_by(Species)
+
+```
+
+```{r}
+
+iris %>%
+  pivot_longer(!Species)
+
+```
+
+```{r}
+
+stats <- list(
+  
+  `__Максимум` = function(x) min(x, na.rm = TRUE),
+  `__Минимум` = function(x) max(x, na.rm = TRUE),
+  `__Среднее значение` = function(x) mean(x, na.rm = TRUE),
+  `__Медиана` = function(x) median(x, na.rm = TRUE)
+  
+)
+
+iris %>%
+  group_by(Species) %>%
+  summarise(across(c(Sepal.Length, Sepal.Width), stats)) %>%
+  pivot_longer(!Species) %>%
+  separate(name, into = c("Переменная", "Параметр"), sep = "___") -> iris_stats_by_group
+
+```
+
+
+# отдельные главы
+
+```{r}
+
+
+iris$Sepal.Length %>% length() # количество значение
+iris$Sepal.Length %>% is.na() %>% sum() # количество пропущенных значений
+iris$Sepal.Length %>% min(na.rm = TRUE) # минимум
+iris$Sepal.Length %>% max(na.rm = TRUE) # максимум
+iris$Sepal.Length %>% mean(na.rm = TRUE) # среднее значение
+iris$Sepal.Length %>% t.test() %>% .$conf %>% as.numeric() %>% round(2) %>% str_c(collapse = ", ") # 95% ДИ для среднего
+iris$Sepal.Length %>% median(na.rm = TRUE) # медиана
+iris$Sepal.Length %>% quantile(0.25, na.rm = TRUE, names = FALSE) # первый квартиль
+iris$Sepal.Length %>% quantile(0.75, na.rm = TRUE, names = FALSE) # третий квартиль
+iris$Sepal.Length %>% quantile(0.75, na.rm = TRUE, names = FALSE) - iris$Sepal.Length %>% quantile(0.25, na.rm = TRUE, names = FALSE) # интерквартильный размах
+
+```
+
+```{r}
+
+iris %>%
+  mutate(petal_length_less_4 = ifelse(Petal.Length < 4, "Да", "Нет") %>% factor(levels = c("Да", "Нет"))) %>%
+  count(Species, petal_length_less_4, .drop = FALSE) %>%
+  group_by(Species) %>%
+  mutate(perc_by_group = (n / sum(n)) %>% round(4) %>% `*`(100) %>% paste0(., "%")) %>%
+  ungroup() %>%
+  mutate(abs_perc = (n / sum(n)) %>% round(4) %>% `*`(100) %>% paste0(., "%"),
+         Species = str_to_sentence(Species)) %>%
+  rename(`Вид цветка` = Species,
+         `Длина чашелистика меньше 4?` = petal_length_less_4,
+         `Абсолютное количество` = n,
+         `Процент по группе` = perc_by_group,
+         `Процент по выборке` = abs_perc)
+
+```
+
+
+
+```{r}
+
+iris_stats_by_group %>%
+  rename(`Группа` = Species,
+         `Значение` = value) %>%
+  mutate(`Значение` = `Значение` %>% round(2),
+         `Переменная` = case_when(`Переменная` == "Sepal.Length" ~ "Длина чашелистика",
+                                  `Переменная` == "Sepal.Width" ~ "Ширина чашелистика") %>% factor(levels = c("Ширина чашелистика", "Длина чашелистика")),
+         `Группа` = `Группа` %>% str_to_sentence())
+
+```
+
+
+```{r}
+
+string_1 <- "Скорость оседания эритроцитов"
+string_2 <- "СОЭ"
+
+stringr::str_to_sentence(string_1) # с большой буквы
+stringr::str_to_lower(string_1) # все маленькие
+stringr::str_to_upper(string_1) # все большие
+stringr::str_c(string_1, " (", string_2, ")") # склеить N строк
+stringr::str_remove(string_1, "ро") # удалить ТОЛЬКО ПЕРВОЕ вхождение подстроки
+stringr::str_remove_all(string_1, "ро") # удалить ВСЕ вхождения подстроки
+stringr::str_replace(string_1, "ро", "LL") # заменить ТОЛЬКО ПЕРВОЕ вхождение подстроки
+stringr::str_replace_all(string_1, "ро", "LL") # заменить ВСЕ вхождения подстроки
+stringr::str_detect(string_1, "Скорость") # есть ли в строке подстрока?
+stringr::str_split(string_1, pattern = " ", simplify = TRUE) %>% as.character() # разбить строку по заданному разделителю
+
+```
+
+```{r}
+
+dataframe_to_rename <- tibble(ERYTH_001 = c(0, 1),
+                              ETYRH_002 = c(0, 1),
+                              BASO_001 = c(0, 1),
+                              BASO_002 = c(0, 1),
+                              NEUTRO_001 = c(0, 1),
+                              NEUTRO_002 = c(0, 1))
+
+original_names <- c("ERYTH", "BASO", "NEUTRO")
+replaced_names <- c("Эритроциты", "Базофилы", "Нейтрофилы")
+
+renamer <- function(var_name, original_names, replaced_names) {
+  
+  
+  var_name %>% stringi::stri_replace_all_regex(original_names, replaced_names, vectorize_all = FALSE)
+
+}
+
+dataframe_to_rename %>%
+  rename_all(function(x) renamer(x, original_names, replaced_names))
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# unite
+
+```{r}
+
+iris %>%
+  unite("species_sepal_length", Species, Sepal.Length, sep = ", sepal length is ")
+
+```
+
+```{r}
+
+iris %>%
+  mutate(species_sepal_length = str_c(Species, ", sepal length is ", Sepal.Length)) -> united_iris
+
+```
+  
+
+# separate
+
+```{r}
+
+united_iris %>%
+  separate(species_sepal_length, into = c("Species", "Sepal.Length"), sep = ", sepal length is ")
+
+```
+
+# flextable
+
+```{r}
+
+stats <- list(
+  
+  `__Максимум` = function(x) min(x, na.rm = TRUE),
+  `__Минимум` = function(x) max(x, na.rm = TRUE),
+  `__Среднее значение` = function(x) mean(x, na.rm = TRUE),
+  `__Медиана` = function(x) median(x, na.rm = TRUE)
+  
+)
+
+iris %>%
+  group_by(Species) %>%
+  summarise(across(c(Sepal.Length, Sepal.Width), stats)) %>%
+  pivot_longer(!Species) %>%
+  separate(name, into = c("Переменная", "Параметр"), sep = "___") %>%
+  rename(`Группа` = Species,
+         `Значение` = value) %>%
+  mutate(`Значение` = `Значение` %>% round(2),
+         `Переменная` = case_when(`Переменная` == "Sepal.Length" ~ "Длина чашелистика",
+                                  `Переменная` == "Sepal.Width" ~ "Ширина чашелистика") %>% factor(levels = c("Ширина чашелистика", "Длина чашелистика")),
+         `Группа` = `Группа` %>% str_to_sentence()) -> iris_stats_by_group
+
+```
+
+
+
+
+```{r}
+
+iris_stats_by_group %>%
+  flextable()
+
+```
+
+```{r}
+
+iris_stats_by_group %>%
+  flextable() %>%
+  theme_box()
+
+```
+
+```{r}
+
+iris_stats_by_group %>%
+  flextable() %>%
+  theme_box() %>%
+  align(align = "center", part = "all")
+
+```
+
+```{r}
+
+iris_stats_by_group %>%
+  flextable() %>%
+  theme_box() %>%
+  align(align = "center", part = "all") %>%
+  merge_v(c("Группа", "Переменная"))
+
+```
+
+```{r}
+
+iris_stats_by_group %>%
+  flextable() %>%
+  theme_box() %>%
+  align(align = "center", part = "all") %>%
+  merge_v(c("Группа", "Переменная")) %>%
+  delete_part(part = "header")
+
+```
+
+```{r}
+
+iris_stats_by_group %>%
+  flextable() %>%
+  theme_box() %>%
+  align(align = "center", part = "all") %>%
+  merge_v(c("Группа", "Переменная")) %>%
+  delete_part(part = "header") %>%
+  hline_top(1:4)
+
+```
+
+```{r}
+
+iris_stats_by_group %>%
+  flextable() %>%
+  theme_box() %>%
+  align(align = "center", part = "all") %>%
+  merge_v(c("Группа", "Переменная")) %>%
+  delete_part(part = "header") %>%
+  hline_top(1:4) %>%
+  bold(i = 1:8, j = 1:2)
+
+```
+
+```{r}
+
+iris_stats_by_group %>%
+  flextable() %>%
+  theme_box() %>%
+  align(align = "center", part = "all") %>%
+  merge_at(i = 1:2, j = 1:2)
+
+```
+
+# создание сложной шапки таблицы
+
+```{r}
+
+make_stats <- function(subtable, vars) {
+  
+  stats <- list(
+  
+  `__Максимум` = function(x) min(x, na.rm = TRUE),
+  `__Минимум` = function(x) max(x, na.rm = TRUE),
+  `__Среднее значение` = function(x) mean(x, na.rm = TRUE),
+  `__Медиана` = function(x) median(x, na.rm = TRUE)
+  
+)
+  
+  subtable %>%
+    select(vars) %>%
+     summarise(across(vars, stats)) %>%
+    pivot_longer(everything()) %>%
+    separate(name, into = c("Переменная", "Параметр"), sep = "___") %>%
+    mutate(value = round(value, 3))
+  
+}
+
+iris %>%
+  split(~ Species) %>%
+  map(function(subtable) make_stats(subtable, c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"))) %>%
+  Reduce(function(...) left_join(..., by = c("Переменная", "Параметр")), x = .) %>%
+  rename(setosa = value.x, versicolor = value.y, virginica = value) %>%
+  mutate(across(everything(), as.character)) -> iris_stats_by_group
+
+tibble(`Переменная` = c("Переменная", "Переменная"),
+       `Параметр` = c("Параметр", "Параметр"),
+       setosa = c("Группа", "Короткие лепестки"),
+       versicolor = c("Группа", "Короткие лепестки"),
+       virginica = c("Группа", "Длинные лепестки")) -> iris_header
+
+iris_header %>%
+  bind_rows(iris_stats_by_group) -> iris_table
+
+```
+
+
+
+```{r}
+
+iris_table %>%
+  flextable() %>%
+  theme_box() %>%
+  align(align = "center", part = "all") %>%
+  merge_v(c("Переменная", "Параметр")) %>%
+  merge_h(1:2) %>%
+  delete_part(part = "header") %>%
+  hline_top(1:5) %>%
+  bold(i = 1:2)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+
+library(CBCgrps)
+library(flextable)
+
+multigrps(iris, "Species")
+
+iris %>%
+  split(~ Species) %>%
+  map(function(x) x %>% select(!Species) %>% psych::describe()) %>%
+  enframe() %>%
+  unnest() %>%
+  mutate(across(where(is.numeric), function(x) round(x, 2))) %>%
+  select(!vars) %>%
+
+  flextable() %>%
+  theme_box() %>%
+  merge_v("name") %>%
+  align(align = "center", part = "all")
+
+```
+
+```{r}
+
+iris %>%
+  select(., Species) %>%
+  filter(., Species == "setosa")
+
+```
+
+
+```{r}
+
+select(iris, Species) -> selected_variable
+filter(selected_variable, Species == "setosa")
+
+```
